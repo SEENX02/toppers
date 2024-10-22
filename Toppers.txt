@@ -1,0 +1,596 @@
+
+Write a program to implement depth first search algorithm. 
+GRAPH:- 
+ 
+PYTHON CODE:- 
+graph1 = { 
+    'A': set(['B', 'C']), 
+    'B': set(['A', 'D', 'E']), 
+    'C': set(['A', 'F']), 
+    'D': set(['B']), 
+    'E': set(['B', 'F']), 
+    'F': set(['C', 'E']) 
+}
+
+def dfs(graph, node, visited):
+    if node not in visited:
+        visited.append(node)
+        for n in graph[node]:
+            dfs(graph, n, visited)
+    return visited
+
+visited = dfs(graph1, 'A', [])
+print(visited)
+  
+ --------------------------------------------------------------------------------------------------------------------------
+PYTHON CODE:- 
+from collections import deque
+
+graph1 = { 
+    'A': set(['B', 'C']), 
+    'B': set(['A', 'D', 'E']), 
+    'C': set(['A', 'F']), 
+    'D': set(['B']), 
+    'E': set(['B', 'F']), 
+    'F': set(['C', 'E']) 
+}
+
+def bfs(graph, start):
+    visited, queue = [], deque([start])
+    while queue:
+        node = queue.popleft()
+        if node not in visited:
+            visited.append(node)
+            queue.extend(graph[node] - set(visited))
+    return visited
+
+print(bfs(graph1, 'A'))
+ 
+ --------------------------------------------------------------------------------------------------------------------------
+Write a program to solve tower of Hanoi problem. 
+ 
+PYTHON CODE: def moveTower(height, fromPole, toPole, withPole):
+    if height >= 1:
+        moveTower(height - 1, fromPole, withPole, toPole)
+        moveDisk(fromPole, toPole)
+        moveTower(height - 1, withPole, toPole, fromPole)
+
+def moveDisk(fp, tp):
+    print("moving disk from", fp, "to", tp)
+
+moveTower(3, "A", "B", "C")
+ 
+ 
+ ----------------------------------------------------------------------------
+AIM:- 
+Write a program to implement alpha beta search. 
+ 
+PYTHON CODE 
+tree = [[[5, 1, 2], [8, -8, -9]], [[9, 4, 5], [-3, 4, 3]]]
+root = 0
+pruned = 0
+
+def children(branch, depth, alpha, beta):
+    global tree
+    global root
+    global pruned
+    i = 0
+    for child in branch:
+        if isinstance(child, list):
+            (nalpha, nbeta) = children(child, depth + 1, alpha, beta)
+            if depth % 2 == 1:
+                beta = nalpha if nalpha < beta else beta
+            else:
+                alpha = nbeta if nbeta > alpha else alpha
+            branch[i] = alpha if depth % 2 == 0 else beta
+            i += 1
+        else:
+            if depth % 2 == 0 and alpha < child:
+                alpha = child
+            if depth % 2 == 1 and beta > child:
+                beta = child
+            if alpha >= beta:
+                pruned += 1
+                break
+    if depth == root:
+        tree = alpha if root == 0 else beta
+    return (alpha, beta)
+
+def alphabeta(in_tree=tree, start=root, upper=-15, lower=15):
+    global tree
+    global pruned
+    global root
+
+    (alpha, beta) = children(tree, start, upper, lower)
+
+    if __name__ == "__main__":
+        print("(alpha, beta): ", alpha, beta)
+        print("Result: ", tree)
+        print("Times pruned: ", pruned)
+
+    return (alpha, beta, tree, pruned)
+
+if __name__ == "__main__":
+    alphabeta(None)
+
+ -------------------------------------------------------------------------------------------------------------------------- 
+Write a program for Hill climbing problem. 
+
+import math
+
+increment = 0.1
+startingPoint = [1, 1]
+point1 = [1, 5]
+point2 = [6, 4]
+point3 = [5, 2]
+point4 = [2, 1]
+
+def distance(x1, y1, x2, y2):
+    dist = math.pow(x2 - x1, 2) + math.pow(y2 - y1, 2)
+    return dist
+
+def sumOfDistances(x1, y1, px1, py1, px2, py2, px3, py3, px4, py4):
+    d1 = distance(x1, y1, px1, py1)
+    d2 = distance(x1, y1, px2, py2)
+    d3 = distance(x1, y1, px3, py3)
+    d4 = distance(x1, y1, px4, py4)
+
+    return d1 + d2 + d3 + d4
+
+def newDistance(x1, y1, point1, point2, point3, point4):
+    d1 = [x1, y1]
+    d1temp = sumOfDistances(x1, y1, point1[0], point1[1],
+                             point2[0], point2[1],
+                             point3[0], point3[1],
+                             point4[0], point4[1])
+    d1.append(d1temp)
+    return d1
+
+minDistance = sumOfDistances(startingPoint[0], startingPoint[1], 
+                              point1[0], point1[1], 
+                              point2[0], point2[1], 
+                              point3[0], point3[1], 
+                              point4[0], point4[1])
+flag = True
+i = 1
+
+while flag:
+    d1 = newDistance(startingPoint[0] + increment, startingPoint[1], point1, point2, point3, point4)
+    d2 = newDistance(startingPoint[0] - increment, startingPoint[1], point1, point2, point3, point4)
+    d3 = newDistance(startingPoint[0], startingPoint[1] + increment, point1, point2, point3, point4)
+    d4 = newDistance(startingPoint[0], startingPoint[1] - increment, point1, point2, point3, point4)
+
+    print(i, ' ', round(startingPoint[0], 2), round(startingPoint[1], 2))
+
+    minimum = min(d1[2], d2[2], d3[2], d4[2])
+    
+    if minimum < minDistance:
+        # Identify which new point has the minimum distance
+        if d1[2] == minimum:
+            startingPoint = [d1[0], d1[1]]
+        elif d2[2] == minimum:
+            startingPoint = [d2[0], d2[1]]
+        elif d3[2] == minimum:
+            startingPoint = [d3[0], d3[1]]
+        elif d4[2] == minimum:
+            startingPoint = [d4[0], d4[1]]
+        
+        minDistance = minimum
+        i += 1
+    else:
+        # Break the loop if no improvement is found
+        flag = False
+
+# Final output
+print("Final point:", round(startingPoint[0], 2), round(startingPoint[1], 2))
+ 
+--------------------------------------------------------------------------------------------------------------------------
+Write a program to implement A* algorithm. 
+  
+PYTHON CODE:- 
+from simpleai.search import SearchProblem, astar
+
+GOAL = 'HELLO WORLD'
+
+class HelloProblem(SearchProblem):
+    def actions(self, state):
+        # If the current state is shorter than the goal, we can add letters
+        if len(state) < len(GOAL):
+            return list(' ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        else:
+            return []  # No actions if we've reached the goal length
+
+    def result(self, state, action):
+        return state + action  # Append the action (character) to the state
+
+    def is_goal(self, state):
+        return state == GOAL  # Check if the current state matches the goal
+
+    def heuristic(self, state):
+        # Calculate how far we are from the goal
+        wrong = sum([1 if state[i] != GOAL[i] else 0 for i in range(len(state))])
+        missing = len(GOAL) - len(state)  # Count how many characters are missing
+        return wrong + missing  # Total heuristic cost
+
+# Create the problem instance with the initial empty state
+problem = HelloProblem(initial_state='')
+
+# Execute the A* search algorithm
+result = astar(problem)
+
+# Print the result state and the path taken to reach it
+print(result.state)  # This should print "HELLO WORLD"
+print(result.path())  # This will print the path taken to reach the goal
+ 
+ --------------------------------------------------------------------------------------------------------------------------
+-------------------------------------
+Design the simulation of TIC – TAC –TOE game using min-max algorithm Diagram:- 
+import os
+import time
+
+# Initialize the game board
+board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
+player = 1
+
+# Define game states
+WIN = 1
+DRAW = -1
+RUNNING = 0
+STOP = 1
+
+game_status = RUNNING
+mark = 'X'
+
+# Function to draw the game board
+def draw_board():
+    print(" %c | %c | %c " % (board[1], board[2], board[3]))
+    print("___|___|___")
+    print(" %c | %c | %c " % (board[4], board[5], board[6]))
+    print("___|___|___")
+    print(" %c | %c | %c " % (board[7], board[8], board[9]))
+    print("   |   |   ")
+
+# Function to check if the position is empty
+def check_position(x):
+    return board[x] == ' '
+
+# Function to check if a player has won
+def check_win():
+    global game_status
+    # Horizontal winning conditions
+    for i in range(1, 10, 3):
+        if board[i] == board[i+1] == board[i+2] != ' ':
+            game_status = WIN
+            return
+
+    # Vertical winning conditions
+    for i in range(1, 4):
+        if board[i] == board[i+3] == board[i+6] != ' ':
+            game_status = WIN
+            return
+
+    # Diagonal winning conditions
+    if board[1] == board[5] == board[9] != ' ' or board[3] == board[5] == board[7] != ' ':
+        game_status = WIN
+        return
+
+    # Check for a draw
+    if all(board[i] != ' ' for i in range(1, 10)):
+        game_status = DRAW
+
+# Main game loop
+print("Tic-Tac-Toe Game")
+print("Player 1 [X] --- Player 2 [O]\n")
+print("Please Wait...")
+time.sleep(1)
+
+while game_status == RUNNING:
+    os.system('cls' if os.name == 'nt' else 'clear')  # Clear the screen
+    draw_board()
+    
+    # Determine the current player's mark
+    mark = 'X' if player % 2 != 0 else 'O'
+    print(f"Player {1 if mark == 'X' else 2}'s turn")
+    
+    # Input validation
+    while True:
+        try:
+            choice = int(input("Enter the position between [1-9] where you want to mark: "))
+            if choice in range(1, 10) and check_position(choice):
+                board[choice] = mark
+                player += 1
+                check_win()
+                break
+            else:
+                print("Invalid position. Try again.")
+        except ValueError:
+            print("Please enter a valid number between 1 and 9.")
+
+# Final board display
+os.system('cls' if os.name == 'nt' else 'clear')
+draw_board()
+
+# Determine the result
+if game_status == DRAW:
+    print("Game Draw")
+elif game_status == WIN:
+    player -= 1  # Adjust player for correct output
+    print(f"Player {1 if player % 2 != 0 else 2} Won")
+     
+ --------------------------------------------------------------------------------------------------------------------------
+ --------------------------------------------------------------------------------------------------------------------------
+
+Design an application to simulate number puzzle problem. 
+PYHTON CODE:- 
+''' 
+8 puzzle problem, a smaller version of the fifteen puzzle: 
+States are defined as string representations of the pieces on the puzzle. 
+Actions denote what piece will be moved to the empty space. 
+States must allways be inmutable. We will use strings, but internally most of the time we will convert those strings to lists, which are easier to handle. For example, the state (string): 
+'1-2-3  4-5-6  7-8-e' will become (in lists): 
+[['1', '2', '3'], 
+ ['4', '5', '6'], 
+ ['7', '8', 'e']] 
+ 
+''' 
+ 
+from __future__ import print_function
+from simpleai.search import astar, SearchProblem
+from simpleai.search.viewers import WebViewer
+
+GOAL = '''1-2-3 
+4-5-6 
+7-e-8'''
+
+INITIAL = '''4-1-2 
+7-e-3 
+8-5-6'''
+
+# Convert a list of lists to a string format
+def list_to_string(list_):
+    return '\n'.join(['-'.join(row) for row in list_])
+
+# Convert a string format to a list of lists
+def string_to_list(string_):
+    return [row.split('-') for row in string_.strip().split('\n')]
+
+# Find the location of a piece in the puzzle
+def find_location(rows, element_to_find):
+    '''Returns a tuple: (row, column) of the element found in the grid'''
+    for ir, row in enumerate(rows):
+        for ic, element in enumerate(row):
+            if element == element_to_find:
+                return ir, ic
+
+# Cache for the goal position of each piece
+goal_positions = {}
+rows_goal = string_to_list(GOAL)
+for number in '12345678e':
+    goal_positions[number] = find_location(rows_goal, number)
+
+# Define the 8-puzzle problem
+class EightPuzzleProblem(SearchProblem):
+    def actions(self, state):
+        '''Returns a list of the pieces we can move to the empty space.'''
+        rows = string_to_list(state)
+        row_e, col_e = find_location(rows, 'e')
+        actions = []
+
+        # Check possible moves to the empty space
+        if row_e > 0:  # Can move piece above
+            actions.append(rows[row_e - 1][col_e])
+        if row_e < 2:  # Can move piece below
+            actions.append(rows[row_e + 1][col_e])
+        if col_e > 0:  # Can move piece to the left
+            actions.append(rows[row_e][col_e - 1])
+        if col_e < 2:  # Can move piece to the right
+            actions.append(rows[row_e][col_e + 1])
+
+        return actions
+
+    def result(self, state, action):
+        '''Return the resulting state after moving a piece to the empty space.'''
+        rows = string_to_list(state)
+        row_e, col_e = find_location(rows, 'e')
+        row_n, col_n = find_location(rows, action)
+
+        # Swap the empty space with the chosen piece
+        rows[row_e][col_e], rows[row_n][col_n] = rows[row_n][col_n], rows[row_e][col_e]
+        return list_to_string(rows)
+
+    def is_goal(self, state):
+        '''Returns true if a state is the goal state.'''
+        return state == GOAL
+
+    def cost(self, state1, action, state2):
+        '''Returns the cost of performing an action.'''
+        return 1  # The cost is constant
+
+    def heuristic(self, state):
+        '''Estimation of the distance from a state to the goal using Manhattan distance.'''
+        rows = string_to_list(state)
+        distance = 0
+        for number in '12345678e':
+            row_n, col_n = find_location(rows, number)
+            row_n_goal, col_n_goal = goal_positions[number]
+            distance += abs(row_n - row_n_goal) + abs(col_n - col_n_goal)
+        return distance
+
+# Run the A* search algorithm
+result = astar(EightPuzzleProblem(INITIAL), viewer=WebViewer())
+
+# Print the result path
+for action, state in result.path():
+    print('Move number:', action)
+ 
+--------------------------------------------------------------------------------------------------------------------------
+Aim:- 
+Write a program to shuffle Deck of cards. 
+Diagram:- 
+ 
+ 
+Python Code:- 
+#first let's import random procedures since we will be shuffling import random 
+ 
+#next, let's start building list holders so we can place our cards in there: 
+import random
+import itertools
+
+# Create a standard deck of cards
+def create_deck():
+    suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
+    royals = ["J", "Q", "K", "A"]
+    cardfaces = [str(i) for i in range(2, 11)] + royals  # Add numbers 2-10 and royals
+
+    # Create a deck by combining faces and suits
+    deck = []
+    for suit in suits:
+        for face in cardfaces:
+            card = f"{face} of {suit}"
+            deck.append(card)
+    
+    return deck
+
+# Shuffle and draw cards
+def draw_cards(deck, number_of_cards=5):
+    random.shuffle(deck)  # Shuffle the deck
+    drawn_cards = deck[:number_of_cards]  # Draw specified number of cards
+    return drawn_cards
+
+# Main program
+if __name__ == "__main__":
+    deck = create_deck()  # Create the deck
+    drawn_cards = draw_cards(deck)  # Draw 5 cards
+
+    print("You got:")
+    for card in drawn_cards:
+        print(card)
+ 
+ -------------------------------------------------------------------------------------------------------------------------- 
+Implementation Of Constraints Satisfactions Problem 
+ 
+PYTHON CODE: 
+from __future__ import print_function
+from simpleai.search import CspProblem, backtrack, min_conflicts
+from simpleai.search import MOST_CONSTRAINED_VARIABLE, HIGHEST_DEGREE_VARIABLE, LEAST_CONSTRAINING_VALUE
+
+# Define the variables representing Australian states
+variables = ('WA', 'NT', 'SA', 'Q', 'NSW', 'V', 'T')
+
+# Define the domain for each variable
+domains = dict((v, ['red', 'green', 'blue']) for v in variables)
+
+# Constraint function: states must be different
+def const_different(variables, values):
+    return values[0] != values[1]  # Adjacent states must have different colors
+
+# Define the constraints based on the adjacency of states
+constraints = [
+    (('WA', 'NT'), const_different),
+    (('WA', 'SA'), const_different),
+    (('SA', 'NT'), const_different),
+    (('SA', 'Q'), const_different),
+    (('NT', 'Q'), const_different),
+    (('SA', 'NSW'), const_different),
+    (('Q', 'NSW'), const_different),
+    (('SA', 'V'), const_different),
+    (('NSW', 'V'), const_different),
+]
+
+# Create the CSP problem instance
+my_problem = CspProblem(variables, domains, constraints)
+
+# Solve the problem using different heuristics and print the results
+print("Backtracking (default):")
+print(backtrack(my_problem))
+
+print("\nBacktracking (Most Constrained Variable):")
+print(backtrack(my_problem, variable_heuristic=MOST_CONSTRAINED_VARIABLE))
+
+print("\nBacktracking (Highest Degree Variable):")
+print(backtrack(my_problem, variable_heuristic=HIGHEST_DEGREE_VARIABLE))
+
+print("\nBacktracking (Least Constraining Value):")
+print(backtrack(my_problem, value_heuristic=LEAST_CONSTRAINING_VALUE))
+
+print("\nBacktracking (Most Constrained + Least Constraining):")
+print(backtrack(my_problem, variable_heuristic=MOST_CONSTRAINED_VARIABLE, 
+                 value_heuristic=LEAST_CONSTRAINING_VALUE))
+
+print("\nBacktracking (Highest Degree + Least Constraining):")
+print(backtrack(my_problem, variable_heuristic=HIGHEST_DEGREE_VARIABLE, 
+                 value_heuristic=LEAST_CONSTRAINING_VALUE))
+
+print("\nMinimum Conflicts:")
+print(min_conflicts(my_problem))
+-------------------------------------------------------------------------------------------------
+male = {'John', 'Robert', 'Michael', 'Kevin'} 
+female = {'Mary', 'Patricia', 'Jennifer', 'Linda'} 
+ 
+parents = { 
+    'John': ['Michael', 'Sarah'],   # John is the father of Michael and Sarah 
+    'Mary': ['Michael', 'Sarah'],    # Mary is the mother of Michael and Sarah 
+    'Robert': ['Kevin'],              # Robert is the father of Kevin 
+    'Patricia': ['Kevin']             # Patricia is the mother of Kevin 
+} 
+def is_father(father, child): 
+    return father in male and child in parents.get(father, []) 
+ 
+def is_mother(mother, child): 
+    return mother in female and child in parents.get(mother, []) 
+ 
+def is_grandfather(grandfather, grandchild): 
+    return grandfather in male and any(is_father(parent, grandchild) or is_mother(parent, 
+grandchild) for parent in parents.get(grandfather, [])) 
+ 
+def is_grandmother(grandmother, grandchild): 
+    return grandmother in female and any(is_father(parent, grandchild) or is_mother(parent, 
+grandchild) for parent in parents.get(grandmother, [])) 
+ 
+def is_brother(sibling1, sibling2): 
+    return sibling1 in male and sibling2 in parents.get(sibling1, parents[sibling2]) 
+ 
+def is_sister(sibling1, sibling2): 
+    return sibling1 in female and sibling2 in parents.get(sibling1, parents[sibling2]) 
+ 
+def is_uncle(uncle, nephew): 
+    return uncle in male and (any(is_brother(uncle, parent) for parent in parents.get(nephew, 
+[])) or any(is_sister(uncle, parent) for parent in parents.get(nephew, []))) 
+ 
+def is_aunt(aunt, niece): 
+    return aunt in female and (any(is_brother(aunt, parent) for parent in parents.get(niece, [])) 
+or any(is_sister(aunt, parent) for parent in parents.get(niece, []))) 
+ 
+def is_cousin(cousin1, cousin2): 
+    return any(parent1 != parent2 and (parent1 in parents.get(cousin2, []) or parent2 in 
+parents.get(cousin1, [])) 
+               for parent1 in parents.get(cousin1, []) 
+               for parent2 in parents.get(cousin2, [])) 
+# Example Queries 
+print("Is John the father of Michael?", is_father('John', 'Michael')) 
+print("Is Mary the mother of Sarah?", is_mother('Mary', 'Sarah')) 
+print("Is Robert a grandfather of Michael?", is_grandfather('Robert', 'Michael')) 
+print("Is Patricia an aunt of Kevin?", is_aunt('Patricia', 'Kevin')) 
+-----------------------------------------------------------------------------------------------
+facts = { 
+    'Sachin': 'batsman', 
+    'batsman': 'cricketer' 
+} 
+ 
+# Function to derive the final fact from the initial fact 
+def derive_fact(starting_subject, target_predicate): 
+    current_subject = starting_subject 
+    while current_subject in facts: 
+        current_subject = facts[current_subject] 
+        if current_subject == target_predicate: 
+            return f"{starting_subject} is {target_predicate}" 
+    return "Cannot derive the fact" 
+ 
+# Define the starting subject and the target predicate 
+starting_subject = 'Sachin' 
+target_predicate = 'cricketer' 
+ 
+# Derive and print the fact 
+result = derive_fact(starting_subject, target_predicate) 
+print(result) 
+ 
